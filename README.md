@@ -3,6 +3,19 @@
 ## 1. Overview
 Heart of the Forest Voyage is a codex-style lore workspace. Content lives in Markdown "cards" with standardized frontmatter, wrappers, and typed templates. Tooling automates: card scaffolding, rewriting, index generation, Mermaid graph visualization, and text hygiene.
 
+## Repo Sharing (Tooling‑Only)
+- Purpose: this repository is configured to share tooling only. All lore content under `Lore/**` and outlines are ignored from version control; directory structure is preserved via `.gitkeep` files.
+- Graph outputs (`Lore/Tree.md`, `Lore/Tree.html`) and the unknown‑reference log are also ignored; the indexer regenerates them as needed. No placeholders required.
+- To publish this repo:
+	1) Create a new empty remote (e.g., GitHub).
+	2) Add and push:
+		 ```powershell
+		 git remote add origin <YOUR_EMPTY_REPO_URL>
+		 git branch -M main
+		 git push -u origin main
+		 ```
+	3) Consumers can clone and immediately run the tasks/utilities; they will generate local lore and graph artifacts that remain untracked.
+
 ## 2. Core Concepts
 - **Card Gen Pack:** Per‑type template + matching "Writing Style" prompt under `.continue/`.
 - **Frontmatter Keys:** `id`, `type`, `name`, optional `parent`, optional `see_also` (array or list). `id = type:slug` (slug is kebab-case of Name).
