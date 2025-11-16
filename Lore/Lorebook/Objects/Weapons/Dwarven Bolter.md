@@ -1,2 +1,0 @@
-### Dwarven Bolter
-The Dwarven bolter is an advanced crossbow analogue powered by interlocking gears and clockwork springs rather than a traditional bow stave. A standard model requires one hundred cranks to fully tension and then fires five bolts from a self-loading magazine before needing to be re-cranked and reloaded. In situations favoring precision over rapid fire, a user can apply only twenty cranks to discharge a single shot, conserving effort while still projecting force.

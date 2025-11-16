@@ -1,4 +1,0 @@
-### Tree Wolf
-Tree wolves are arboreal-adapted wolves found in dense greenways. Limbs run slightly longer with flexible wrists, forepaws bear long hooking claws and the tail thickens for counterbalance. A thin web of skin from wrist to hip can unfurl during a leap to catch air; the tail trims direction like a rudder. Pads along the outer edge harden to bite bark without slipping.
-
-They move in short, silent bounds from branch to branch and climb near-vertical trunks with practiced rhythm. With the webbing deployed they can cross wider gaps in a shallow glide, skimming ravines and river cuts that halt ground pursuit. It is not flight and it demands height and a clean landing. Ground speed drops compared to common wolves and long runs fatigue the forelimbs first, but canopy routes multiply angles of approach and escape.

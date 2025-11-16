@@ -1,2 +1,0 @@
-### Old Ones
-The Old Ones are primal spirits brought into being by the Spirit of the Green when the Greenwood was still young. Fenril the Great Wolf, his raven-king companion, the First Bear and others of their kind have walked the worlds since the beginning, traveling freely between realms. They once strode the mortal plane in physical form to guide the races; now they seldom intervene, as most peoples have abandoned the old ways. Druids, shamans and fey still remember and entreat them.

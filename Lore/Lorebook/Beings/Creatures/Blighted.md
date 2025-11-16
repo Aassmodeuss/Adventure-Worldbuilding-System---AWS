@@ -1,2 +1,0 @@
-﻿### Blighted
-The Blighted are creatures reshaped by the corruption's touch into grotesque parodies of themselves-flesh bubbling with unnatural growths or mineralizing into chitinous plates. Minds warp as bodies do: fear and pain give way to ravenous aggression, turning even herbivores into relentless predators. Some, especially those caught early, retain fragments of who they were. Sentient beings who receive treatment soon enough to preserve sanity and halt mutation are known as the Baned.

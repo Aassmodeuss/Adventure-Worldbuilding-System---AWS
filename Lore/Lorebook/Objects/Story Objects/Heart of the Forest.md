@@ -1,2 +1,0 @@
-﻿### Heart of the Forest
-The Heart of the Forest was an ancient Greenwood artifact resembling a large crystaline seed. Its true origin is unknown. It maintained balance and checked the Blight's spread for as long asanyone coul remember. Under mysterious circumstances the Heart was corrupted and destroyed; its shattering unleashed an explosion that annihilated Verdant Hall and scattered tainted fragments across the Greenwood, spreading Blight and birthing the Forsaken Lands.

@@ -1,4 +1,0 @@
-### Greater Tree Wolf
-Greater tree wolves are bear-sized canopy runners that trade subtlety for reach and power above the forest floor. Shoulders and hips broaden, forelimbs lengthen and knot with climbing muscle and dewclaws develop into usable spurs. Pads along the outer edge harden to bite rough bark under load; tails thicken further for counterbalance.
-
-They travel the high road along primary limbs, taking measured leaps where the canopy allows. A greater tree wolf can drop and catch on a trunk with foreclaws and chest, then spiral upward without breaking pace. From above a pack keeps a steady patrol, flanks in silence when wood is green and sound and chooses ambush angles no ground hunter can match. The greater mass narrows usable routes and sheds bark on dry limbs. Ground speed and agility fall below that of dire wolves and long crossings tire the forelimbs, so packs plan rests and read wind, rot and limb thickness constantly.

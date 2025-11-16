@@ -1,2 +1,0 @@
-﻿### Treant
-Treants are ancient, sentient denizens of the Greenwood whose bodies are living wood and bark. Tall and sturdy, with leaf-like hair and softly glowing eyes, they can influence the growth of plants and trees to maintain balance. Revered for wisdom, Treants are fiercely protective of their territory and those within it. They often work with druids, fey and Dryads to safeguard the natural order.

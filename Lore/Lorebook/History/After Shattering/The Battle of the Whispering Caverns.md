@@ -1,3 +1,0 @@
-### The Battle of the Whispering Caverns
-In the year 702:AF it was discovered that Malakai had survived the Shattering and had fled to the Whispering Caverns in order to recover from the injuries he sustained in the destruction of Verdant Hall and to rebuild his forces. The surviving Rangers and people of Greenwood banded together and lead an assault into the Whispering Caverns. After a long fight,  a nearly defeated Malakai cast a powerful spell bringing the caverns down on his enemies, his forces and himself. Malakai was presumed killed in the collapse and there have been no signs of Malakai or his follower's survival in the years since. 
-Only few dozen Rangers survived the final battle with Malakai and went on to found the Warden order.
