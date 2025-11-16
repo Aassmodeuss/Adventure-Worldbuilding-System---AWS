@@ -106,6 +106,45 @@ function ConvertTo-Slug {
     return $t
 }
 
+# Heuristic: does a location name look specific (proper-noun-like) vs generic?
+function Test-IsSpecificLocationName {
+    param([string]$Name)
+    if (-not $Name) { return $false }
+    $n = ("$Name").Trim()
+    if ($n -eq '') { return $false }
+    # Quick rejects: extremely short or punctuation-only
+    if ($n.Length -lt 3) { return $false }
+    if ($n -notmatch '[A-Za-z]') { return $false }
+    # Normalize quotes
+    $n = $n.Trim([char]34,[char]39)
+    # Tokenize words (letters/numbers only)
+    $tokens = [regex]::Matches($n, '[A-Za-z][A-Za-z0-9'']*') | ForEach-Object { $_.Value }
+    if (-not $tokens -or $tokens.Count -eq 0) { return $false }
+    # Common generic words to ignore as the sole/distinctive token
+    $generic = @(
+        'the','a','an','old','ancient','abandoned','small','little','great','north','south','east','west',
+        'upper','lower','central','outer','inner','new','old',
+        'village','camp','encampment','bridge','road','trail','path','river','ford','bank','bend','forest','woods','grove',
+        'clearing','cave','caves','cavern','caverns','lake','pond','hill','hills','valley','tower','gate','market','square',
+        'docks','harbor','harbour','mine','mines','quarry','ruins','inn','tavern','keep','hold','fort','outpost','watchtower'
+    )
+    $genSet = New-Object 'System.Collections.Generic.HashSet[string]'
+    foreach ($g in $generic) { [void]$genSet.Add($g) }
+    # Rule 1: if at least one token starts with uppercase and isn't a generic stopword -> specific
+    foreach ($t in $tokens) {
+        if ($t.Length -ge 1 -and ($t[0] -cmatch '[A-Z]')) {
+            if (-not $genSet.Contains($t.ToLowerInvariant())) { return $true }
+        }
+    }
+    # Rule 2: Single-word TitleCase like "Stormbridge" is also acceptable
+    if ($tokens.Count -eq 1) {
+        $w = $tokens[0]
+        if ($w[0] -cmatch '[A-Z]' -and $w.Length -ge 5 -and -not $genSet.Contains($w.ToLowerInvariant())) { return $true }
+    }
+    # Otherwise treat as generic
+    return $false
+}
+
 function Get-PackPaths {
     param([string]$Type)
 
@@ -236,6 +275,9 @@ function Get-TemplateFieldSpecs {
             if ($label -eq 'Aliases') {
                 $extraHint = 'List 1-3 alternate tribal, historical, or exonym names if any exist; avoid speculative cross-references.'
             }
+            if ($label -eq 'Locations of Note') {
+                $extraHint = 'Return 1-5 unique proper-noun place names subordinate to this card. Use distinctive names (e.g., “Emberhold Archives”, “Stormbridge”), not generic terms (e.g., “old bridge”, “forest clearing”, “village”). Title-case each entry.'
+            }
             # Skip Summary and Full Description here (handled separately)
             # Skip Name (deterministic from frontmatter) as well
             if ($label -ne 'Summary' -and $label -ne 'Full Description' -and $label -ne 'Name') {
@@ -345,6 +387,24 @@ function Test-PlaceholderValue {
     }
     if ($byKeyStartsWith.ContainsKey($Key)) {
         foreach ($prefix in $byKeyStartsWith[$Key]) { if ($t.StartsWith($prefix)) { return $true } }
+    }
+    # Special handling: Locations of Note must be specific proper-noun names; treat generics as placeholder
+    if ($Key -eq 'locations_of_note') {
+        $items = @()
+        if ($Value -is [System.Array]) { $items = $Value } elseif ($Value) { $items = @("$Value") }
+        # Deduplicate (case-insensitive)
+        $seen = New-Object 'System.Collections.Generic.HashSet[string]'
+        $specificCount = 0
+        foreach ($raw in $items) {
+            if (-not $raw) { continue }
+            $norm = ("$raw").Trim()
+            $keyci = $norm.ToLowerInvariant()
+            if ($seen.Contains($keyci)) { continue }
+            [void]$seen.Add($keyci)
+            if (Test-IsSpecificLocationName -Name $norm) { $specificCount++ }
+        }
+        # Require at least 1 specific unique entry; otherwise it's effectively placeholder/generic
+        if ($specificCount -lt 1) { return $true }
     }
     return $false
 }
@@ -1467,6 +1527,31 @@ if ($ExtraNotes) {
     foreach ($k in $ExtraNotes.Keys) {
         $additional[$k] = $ExtraNotes[$k]
     }
+}
+
+# Sanitize Locations of Note: keep only specific, unique names (proper-noun-like)
+if ($additional.ContainsKey('locations_of_note')) {
+    $vals = $additional['locations_of_note']
+    $clean = @()
+    $seen = New-Object 'System.Collections.Generic.HashSet[string]'
+    if ($vals -is [System.Array]) {
+        foreach ($it in $vals) {
+            if (-not $it) { continue }
+            $norm = ("$it").Trim('"',[char]39).Trim()
+            if ($norm -eq '') { continue }
+            $ci = $norm.ToLowerInvariant()
+            if ($seen.Contains($ci)) { continue }
+            if (Test-IsSpecificLocationName -Name $norm) {
+                [void]$seen.Add($ci)
+                $clean += $norm
+            }
+        }
+    } elseif ($vals) {
+        $norm = ("$vals").Trim('"',[char]39).Trim()
+        if (Test-IsSpecificLocationName -Name $norm) { $clean = @($norm) }
+    }
+    if ($clean.Count -gt 0) { $additional['locations_of_note'] = $clean }
+    else { $additional.Remove('locations_of_note') | Out-Null }
 }
 
 $editedText = Set-CardSections -CardText $baseText -Summary $summary -FullDescription $fullDesc -AdditionalFields $additional
