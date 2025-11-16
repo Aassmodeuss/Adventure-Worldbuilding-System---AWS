@@ -16,32 +16,25 @@ Thumbs.db
 
 # Exclude all lore content from version control; keep empty dirs with .gitkeep
 /Lore/**
+!/Lore/
+!/Lore/**/
 !/.gitignore
 !/Lore/.gitkeep
 !/Lore/**/.gitkeep
 
-# Allow Lore/Lorebook directory but ignore its contents except .gitkeep
-!/Lore/Lorebook/
-/Lore/Lorebook/**
-!/Lore/Lorebook/.gitkeep
-!/Lore/Lorebook/**/.gitkeep
-
-# Allow Lore/Lore Conflicts directory but ignore its contents except .gitkeep
-!/Lore/Lore Conflicts/
-/Lore/Lore Conflicts/**
-!/Lore/Lore Conflicts/.gitkeep
-!/Lore/Lore Conflicts/**/.gitkeep
-
+# Personal outlines or design docs (likely contain direct lore)
 # Personal outlines or design docs (likely contain direct lore)
 /Outlines/**
+!/Outlines/
+!/Outlines/**/
 !/Outlines/.gitkeep
 !/Outlines/**/.gitkeep
 # Also ignore outlines under Lore (present in this repo)
 /Lore/Outlines/**
+!/Lore/Outlines/
+!/Lore/Outlines/**/
 !/Lore/Outlines/.gitkeep
 !/Lore/Outlines/**/.gitkeep
- !/Outlines/.gitkeep
- !/Outlines/**/.gitkeep
 
 # Environment files and local secrets
 .env
