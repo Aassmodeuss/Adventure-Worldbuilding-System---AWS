@@ -1,0 +1,3 @@
+﻿### Shadow Panther
+Shadow Panthers haunt the Greenwood's darkest undergrowth. Nocturnal and solitary, they prey on small mammals and unwary travelers. Their black fur holds a subtle magic that blurs their outline into shadow, while ember-like eyes glow in the gloom. Silent and relentless, they climb easily and leap great distances, making them formidable hunters in dense terrain. Inhabitents of the Greenwood whisper of ghostlike appearances and claws that strike without warning, feeding the panther's fearful legend. The pelt of a Shadow Panther retains its magical properties even in death and is highly prized among hunters and assassins alike as a material for crafting armor.
+

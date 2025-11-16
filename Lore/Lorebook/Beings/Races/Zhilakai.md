@@ -1,0 +1,2 @@
+﻿### Zhilakai
+Zhilakai are reclusive, arboreal humanoids, tall and slender with elongated limbs and digits. Thin, translucent skin reflects surrounding colors, aiding them in blending with the canopy. Large black eyes with vertical pupils grant keen low-light sight, and hair like fine fibers resembles spider silk. Master weavers and architects, they spin suspended bridges and treetop dwellings that seem to defy gravity. Zhilakai live in small matriarchal communities led by elders attuned to the spirits of the forest and fiercely defend their territories.

@@ -1,0 +1,2 @@
+### Duergar
+Duergar are corrupted cousins of the dwarves, twisted by the Blight. They hate the uncorrupted and seize chances to kill or enslave them. Their society runs on raiding and enslavement of dwarf and gnome settlements and subjugation of Gorlek and Ratling clans. Duergar hold themselves superior to other subterraneans and rarely cooperate with outsiders willingly.

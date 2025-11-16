@@ -1,0 +1,15 @@
+# Roles and Classes
+
+### Purger
+Purgers are elite Warden hunters specializing in tracking and eliminating Corruptors—creatures bearing virulent Blight strains. Leadership selects them from the Wardens’ most skilled members. They read forest rhythms to set precise ambushes and traps and are adept with poison and venom. A Purger’s driving goal is eradication of Corruptors by any necessary means. Most are chosen for archery prowess, though Wardens with an affinity for fire magic or Shamanic/Druidic training are sent to join squads once they gain enough experience.
+
+### Druids
+Greenwood Druids steward the ancient forest, wielding nature magic to keep balance beneath the towering canopy. Since Eastgrove’s destruction, the Westgrove Circle remains the last unified assembly; their rituals sustain pockets of uncorrupted land along Forsaken borders. Druids treat early-stage Blight with enchanted salves and fire-purging rites yet burn fully corrupted creatures without hesitation. Grove gardens cultivate rare Blight-resistant plants harvested for medicines and protective charms.
+
+### Heartkeeper
+The Heartkeeper was a sacred hereditary title within Kieara Oakenheart’s bloodline charged with safeguarding the Heart of the Forest and maintaining its magical balance. The last true Heartkeeper died in the Shattering, though rumor suggests a fragment of her spirit lingers in Verdant Hall’s corrupted ruins. Heartkeeper rites demanded precise communion blending druidic practice with ancient family rituals; neglecting tradition risked destabilizing wards that held the Blight in check.
+
+### Shifter
+Shifters are beings bonded to a primal animal spirit, one of the Old Ones. Even in natural form they wear subtle marks of the bond, such as wolfish eyes or sharpened hearing. Their abilities flow from intent, need and instinct, often manifesting unpredictably until tempered by experience. Shifters can be extremely long-lived and do not age, but they must control the animal nature within or risk losing themselves to it. Training from another shifter, druid or spirit guide can hasten mastery.
+
+Shifters resist charms, curses and most magic; as their power grows this resistance approaches near-immunity. They are immune to nearly all known poisons and diseases, and heal far faster than mortals. Minor wounds in minutes, serious injuries in hours or days, with the speed of regeneration increasing as their power grows. Shifters can transform their bodies to meet circumstance, and their spirit bond lets them perceive and manipulate the natural weave of magic: sensing enchantments, disrupting another caster’s workings and bypassing wards. By tapping primal forces through the bond, a shifter may mimic basic spells without weaving formal patterns. Nearby magic or spellcasting pricks their senses like a sharp burning scent.

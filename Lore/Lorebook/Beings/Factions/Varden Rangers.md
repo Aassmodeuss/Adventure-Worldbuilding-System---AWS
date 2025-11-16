@@ -1,0 +1,3 @@
+﻿### Varden Rangers
+The Varden Rangers served for centuries as the High Council's constables, game wardens, scouts and soldiery. Known for fairness, they arbitrated disputes and rendered judgment in remote regions. Skilled woodsmen-hunters, trackers, archers and fighters-they maintained outposts and forts across the Greenwood, most notably Emberhold near the Whispering Caverns. During Malakai Ashwood's rise and the purges that followed, many Rangers joined his cause or died in the crackdowns or in the final battle at the Whispering Caverns. Once a proud order of thousands, only a few dozen survived the fall of Verdant Hall and the Shattering; most of those veterans later founded and joined the Wardens. Their symbol is a large tree crossed with two arrows.
+

@@ -1,0 +1,2 @@
+### The Shattering
+The Shattering was the magical cataclysm triggered by the destruction of the Heart of the Forest. Corrupted shards rained across Greenwood, birthing Blight infected zones that became the Forsaken Lands and reshaping the balance of power, ecology and travel throughout the forest.

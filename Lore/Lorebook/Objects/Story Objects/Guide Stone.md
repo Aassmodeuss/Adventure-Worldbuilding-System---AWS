@@ -1,0 +1,2 @@
+### Guide Stone
+A guide stone is a small magical artifact that can be used to locate lost objects or people. When held hung from a string and the desired item is pictured in the user's mind it will point a directly towards the object or person sought. A guide stone will have the same effect when placed on a map of a region the user wishes to search.

@@ -1,0 +1,2 @@
+### Heart Shards (Corrupted Fragments)
+Heart shards are crystalline splinters from the shattered Heart of the Forest, each emitting a subtle field that warps growth and lends nearby magic a scent like hot sap. Small fragments can embed in roots or stone and may be excavated before corruption anchors; Treants, Dryads and Druids attempt purging rites using fire and consecrated waters. Larger clusters seed pockets of Blight corrupted forest.

@@ -1,0 +1,2 @@
+﻿### Gorlek
+Gorlek are small cave-dwellers native to tunnels beneath the Wyrmspine Mountains. Gifted tinkerers with a talent for sabotage, they form loose clans bound by constantly shifting alliances. Gorlek sometimes forge uneasy alliances with other subterranean races such as the Duergar to pursue secrets and profit. Many possess a knack for communing with mechanisms, a trait they exploit in clever heists. Their love of pranks fuels a reputation as cunning tricksters.
