@@ -1,4 +1,4 @@
-# Heart of the Forest — Unified Lore Guide
+# AWS — Unified Lore Guide
 
 Purpose
 - Provide one clear, authoritative standard for creating and editing Heart of the Forest lore.
