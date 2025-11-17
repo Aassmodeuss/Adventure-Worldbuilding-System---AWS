@@ -1,7 +1,9 @@
-# Heart of the Forest Voyage — Lore Authoring & Tooling Guide
+# 
+Adventure-Worldbuilding-System Lore Authoring & Tooling Guide
 
 ## 1. Overview
-Heart of the Forest Voyage is a codex-style lore workspace. Content lives in Markdown "cards" with standardized frontmatter, wrappers, and typed templates. Tooling automates: card scaffolding, rewriting, index generation, Mermaid graph visualization, and text hygiene.
+
+Adventure-Worldbuilding-System is a codex-style lore workspace. Content lives in Markdown "cards" with standardized frontmatter, wrappers, and typed templates. Tooling automates: card scaffolding, rewriting, index generation, Mermaid graph visualization, and text hygiene.
 
 ## Repo Sharing (Tooling‑Only)
 - Purpose: this repository is configured to share tooling only. All lore content under `Lore/**` and outlines are ignored from version control; directory structure is preserved via `.gitkeep` files.
