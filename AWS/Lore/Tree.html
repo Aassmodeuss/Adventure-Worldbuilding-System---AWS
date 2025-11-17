@@ -1,0 +1,215 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lore Tree</title>
+<style>
+    html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #181a20; color: #e2e8f0; }
+    .container { padding: 12px; height: 100vh; box-sizing: border-box; }
+    .mermaid { position: relative; width: 100%; height: calc(100vh - 40px); overflow: visible; background: #181a20; }
+    .mermaid svg { height: 100% !important; background: #181a20 !important; }
+    /* Compact toolbar top-right */
+    #toolbar { position: fixed; top: 8px; right: 8px; z-index: 10000; background: rgba(32,32,40,0.92); border: 1px solid #23272f; border-radius: 4px; padding: 4px 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 12px; color: #e2e8f0; }
+    #toolbar button { font-size: 12px; padding: 2px 6px; line-height: 1.1; cursor: pointer; background: #23272f; color: #e2e8f0; border: 1px solid #374151; }
+    #toolbar label { font-size: 12px; margin-left: 6px; cursor: pointer; color: #e2e8f0; }
+    #legend { position: fixed; bottom: 8px; left: 8px; z-index: 10000; background: rgba(32,32,40,0.92); border: 1px solid #23272f; border-radius: 4px; padding: 6px 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 12px; color: #e2e8f0; max-width: 220px; }
+    #legend h4 { margin: 0 0 4px 0; font-size: 12px; font-weight: 600; letter-spacing: .5px; color: #cbd5e0; }
+    #legend ul { list-style: none; padding: 0; margin: 0; }
+    #legend li { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+    #legend svg { flex-shrink: 0; }
+    .edgeIcon path { stroke: #e2e8f0; }
+    .edgeIconParent path { stroke-width:2; stroke:#e2e8f0; }
+    .edgeIconSeeAlso path { stroke-width:2; stroke:#e2e8f0; stroke-dasharray:4 4; }
+    /* Hide built-in svg-pan-zoom control icons and variants */
+    .svg-pan-zoom-control, .svg-pan-zoom-control-background, g.svg-pan-zoom-control, .svg-pan-zoom_buttons { display: none !important; }
+    /* Make node label text ignore pointer events so tooltips show reliably */
+    .mermaid svg .node text, .mermaid svg g.node text, .mermaid svg g.node tspan, .mermaid svg text, .mermaid svg tspan {
+        pointer-events: none !important;
+        cursor: inherit !important;
+        fill: #e2e8f0 !important;
+    }
+    /* Tooltip styling */
+    #tooltip { position: fixed; max-width: 380px; background: rgba(17,24,39,0.95); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px; line-height: 1.3; border: 1px solid #374151; box-shadow: 0 2px 8px rgba(0,0,0,0.25); pointer-events: none; display: none; z-index: 10001; }
+</style>
+<script>
+    // Injected full lore card mapping for tooltips
+    window.__cardMap = {
+    "realm_americana":  "#### [Realm]\n**Name:** Americana\n**Summary:** Americana is a radioactive wasteland created when humanity unleashed its most destructive weapons upon itself, leaving the Americas barren and desolate.\n**Full Description:** Americana stands as a testament to the devastation wrought by human conflict and unchecked ambition. Once a thriving continent, Americana is now a vast desert of irradiated ruins and lifeless plains. The region is dominated by the Sea of Glass, a shimmering expanse formed by intense heat and nuclear fire. Survivors in Americana are few, consisting of scattered bands of humanity and mutated descendants. The land offers little hope, with resources scarce and the environment hostile to life. Despair and loss permeate every settlement, and the memory of civilization lingers only in broken monuments. Americana endures as a realm of hopelessness, shaped by irreversible choices and the consequences of war.\n**Local Inhabitants:** Humanity, Mutants\n**Tone Keywords:** desert, wasteland, loss, despair, hopelessness\n**Locations of Note:** The Sea of Glass\n**Potential Gameplay Hooks:**\n- Mutant factions clash over dwindling water sources\n- Ancient bunkers release toxic plumes into the wasteland\n- A deadly sandstorm uncovers forgotten relics in the Sea of Glass",
+    "World_terra":  "#### [World]\n**Name:** Terra\n**Summary:** In the far future, mankind has turned Terra, their birthplace, into a desolate wasteland. Few remnants of civilization remain amid the devastation.\n**Full Description:** Terra is a world marked by the scars of human ambition and neglect. Once vibrant, Terra now endures as a barren wasteland shaped by centuries of conflict and environmental collapse. The last inhabitants of Terra, remnants of mankind, struggle to survive among ruins and toxic landscapes. Ancient cities like the Ashen Spires and the Vault of Echoes stand as silent witnesses to lost glory. The atmosphere is harsh and resources are scarce, forcing adaptation and resilience. Terra\u0027s surface is dotted with hazardous zones such as the Glassed Barrens and the Ironbone Expanse. The world is haunted by memories of its past and the consequences of irreversible change. Terra remains a stark reminder of the cost of unchecked progress.\n**Local Inhabitants:** Mankind\n**Tone Keywords:** far future, loss, wasteland, apocalypse\n**Locations of Note:** Ashen Spires, Vault of Echoes, Glassed Barrens, Ironbone Expanse\n**Potential Gameplay Hooks:**\n- Toxic storms threaten the last habitable enclaves\n- Ancient machines awaken beneath the Ashen Spires\n- Resource scarcity drives conflict among isolated survivors"
+};
+    window.__labelCardMap = {
+    "World: Terra":  "#### [World]\n**Name:** Terra\n**Summary:** In the far future, mankind has turned Terra, their birthplace, into a desolate wasteland. Few remnants of civilization remain amid the devastation.\n**Full Description:** Terra is a world marked by the scars of human ambition and neglect. Once vibrant, Terra now endures as a barren wasteland shaped by centuries of conflict and environmental collapse. The last inhabitants of Terra, remnants of mankind, struggle to survive among ruins and toxic landscapes. Ancient cities like the Ashen Spires and the Vault of Echoes stand as silent witnesses to lost glory. The atmosphere is harsh and resources are scarce, forcing adaptation and resilience. Terra\u0027s surface is dotted with hazardous zones such as the Glassed Barrens and the Ironbone Expanse. The world is haunted by memories of its past and the consequences of irreversible change. Terra remains a stark reminder of the cost of unchecked progress.\n**Local Inhabitants:** Mankind\n**Tone Keywords:** far future, loss, wasteland, apocalypse\n**Locations of Note:** Ashen Spires, Vault of Echoes, Glassed Barrens, Ironbone Expanse\n**Potential Gameplay Hooks:**\n- Toxic storms threaten the last habitable enclaves\n- Ancient machines awaken beneath the Ashen Spires\n- Resource scarcity drives conflict among isolated survivors",
+    "Realm: Americana":  "#### [Realm]\n**Name:** Americana\n**Summary:** Americana is a radioactive wasteland created when humanity unleashed its most destructive weapons upon itself, leaving the Americas barren and desolate.\n**Full Description:** Americana stands as a testament to the devastation wrought by human conflict and unchecked ambition. Once a thriving continent, Americana is now a vast desert of irradiated ruins and lifeless plains. The region is dominated by the Sea of Glass, a shimmering expanse formed by intense heat and nuclear fire. Survivors in Americana are few, consisting of scattered bands of humanity and mutated descendants. The land offers little hope, with resources scarce and the environment hostile to life. Despair and loss permeate every settlement, and the memory of civilization lingers only in broken monuments. Americana endures as a realm of hopelessness, shaped by irreversible choices and the consequences of war.\n**Local Inhabitants:** Humanity, Mutants\n**Tone Keywords:** desert, wasteland, loss, despair, hopelessness\n**Locations of Note:** The Sea of Glass\n**Potential Gameplay Hooks:**\n- Mutant factions clash over dwindling water sources\n- Ancient bunkers release toxic plumes into the wasteland\n- A deadly sandstorm uncovers forgotten relics in the Sea of Glass"
+};
+</script>
+<!-- Load pan/zoom library first so setup can bind immediately -->
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+    // Define setupPanZoom and attachTitles before Mermaid runs
+    window.setupPanZoom = function() {
+        var svg = document.querySelector('.mermaid svg, svg.mermaid');
+        if (!(svg && window.svgPanZoom)) return;
+        var panZoom = window.svgPanZoom(svg, { controlIconsEnabled: false, fit: true, center: true, zoomScaleSensitivity: 0.3, contain: false });
+
+        var invert = false;
+        var zin = document.getElementById('zin');
+        var zout = document.getElementById('zout');
+        var fitBtn = document.getElementById('fit');
+        var reset = document.getElementById('reset');
+        var invertChk = document.getElementById('invert');
+
+        if (zin) zin.addEventListener('click', function(){ panZoom.zoomBy(1.2); });
+        if (zout) zout.addEventListener('click', function(){ panZoom.zoomBy(0.8333); });
+        if (fitBtn) fitBtn.addEventListener('click', function(){ panZoom.fit(); panZoom.center(); });
+        if (reset) reset.addEventListener('click', function(){ panZoom.reset(); panZoom.fit(); panZoom.center(); });
+        window.addEventListener('resize', function(){ panZoom.resize(); panZoom.fit(); panZoom.center(); });
+        if (invertChk) invertChk.addEventListener('change', function(){ invert = invertChk.checked; });
+
+        var container = document.querySelector('.mermaid');
+        if (container) {
+            container.addEventListener('wheel', function(e){
+                if (e.ctrlKey) return;
+                e.preventDefault();
+                var delta = e.deltaY || e.wheelDelta || 0;
+                var factor = (delta > 0 ? 0.9 : 1.1);
+                if (invert) factor = (delta > 0 ? 1.1 : 0.9);
+                var pt = { x: e.clientX, y: e.clientY };
+                panZoom.zoomAtPointBy(factor, pt);
+            }, { passive: false });
+        }
+
+        window.addEventListener('keydown', function(e){
+            if (e.key === '+' || e.key === '=') { panZoom.zoomBy(1.2); }
+            if (e.key === '-' || e.key === '_') { panZoom.zoomBy(0.8333); }
+            if (e.key === '0') { panZoom.fit(); panZoom.center(); }
+        });
+    };
+
+    window.attachTitles = function() {
+        var svg = document.querySelector('.mermaid svg, svg.mermaid');
+        var map = (window.__cardMap || {});
+        var labelMap = (window.__labelCardMap || {});
+        if (!svg) return;
+
+        function getCardForGroup(g){
+            if (!g) return null;
+            if (g.id && Object.prototype.hasOwnProperty.call(map, g.id)) return map[g.id];
+            if (g.id) {
+                var keys = Object.keys(map || {});
+                var k = keys.find(function(x){ return (g.id || '').indexOf(x) !== -1; });
+                if (k && map[k]) return map[k];
+            }
+            try {
+                var parts = [];
+                var tspans = g.querySelectorAll('text, tspan');
+                if (tspans && tspans.length) {
+                    for (var i=0; i<tspans.length; i++){ parts.push(tspans[i].textContent || ''); }
+                } else {
+                    parts.push(g.textContent || '');
+                }
+                var raw = parts.join('').replace(/\s+/g,' ').trim();
+                if (raw && Object.prototype.hasOwnProperty.call(labelMap, raw)) return labelMap[raw];
+            } catch(e){}
+            return null;
+        }
+
+        var groups = svg.querySelectorAll('g[class*="node"], g.node');
+        for (var i=0; i<groups.length; i++) {
+            var g = groups[i];
+            var card = getCardForGroup(g);
+            if (!card) continue;
+            try {
+                var existing = g.querySelector('title');
+                if (!existing) {
+                    var t = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                    t.textContent = card;
+                    g.insertBefore(t, g.firstChild);
+                }
+            } catch(e){}
+        }
+    };
+</script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'base', flowchart: { curve: 'basis', nodeSpacing: 80, rankSpacing: 150 } });
+  await mermaid.run({ querySelector: '.mermaid' });
+    if (window.setupPanZoom) window.setupPanZoom();
+    if (window.attachTitles) window.attachTitles();
+    // Force pointer-events: none on all text/tspan inside g.node so tooltips show everywhere
+    const svgEl = document.querySelector('.mermaid svg');
+    if (svgEl) {
+        const nodes = svgEl.querySelectorAll('g.node');
+        nodes.forEach(g => {
+            g.querySelectorAll('text, tspan').forEach(t => {
+                t.style.cursor = 'inherit';
+                t.style.pointerEvents = 'none';
+            });
+        });
+        // Preserve original viewBox to keep edge labels centered.
+    }
+</script>
+</head>
+<body>
+  <div class="container">
+        <div id="toolbar" role="toolbar" aria-label="Diagram controls">
+            <button id="zin" title="Zoom In" aria-label="Zoom In">+</button>
+            <button id="zout" title="Zoom Out" aria-label="Zoom Out">âˆ’</button>
+            <button id="fit" title="Fit to Screen" aria-label="Fit">Fit</button>
+            <button id="reset" title="Reset View" aria-label="Reset">Reset</button>
+            <label title="Invert Scroll Zoom" aria-label="Invert Scroll Zoom"><input type="checkbox" id="invert" /> Invert Scroll Zoom</label>
+        </div>
+        <div id="legend" aria-label="Legend">
+            <h4>Legend</h4>
+            <ul>
+                <li>
+                    <svg class="edgeIcon edgeIconParent" width="38" height="10" viewBox="0 0 38 10" aria-hidden="true"><path d="M2 5 L32 5" fill="none"/><path d="M32 5 L26 2 L26 8 Z" fill="#e2e8f0"/></svg>
+                    <span>Parent relationship (solid)</span>
+                </li>
+                <li>
+                    <svg class="edgeIcon edgeIconSeeAlso" width="38" height="10" viewBox="0 0 38 10" aria-hidden="true"><path d="M2 5 L32 5" fill="none"/><path d="M32 5 L26 2 L26 8 Z" fill="#e2e8f0"/></svg>
+                    <span>See Also (cross-reference)</span>
+                </li>
+            </ul>
+        </div>
+    <div class="mermaid">
+%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 80, "rankSpacing": 150}, "theme": "dark", "themeVariables": {"background": "#181a20", "primaryColor": "#23272f", "edgeColor": "#e2e8f0", "fontFamily": "Segoe UI, Roboto, sans-serif", "fontSize": "16px", "nodeTextColor": "#e2e8f0", "lineColor": "#e2e8f0", "secondaryColor": "#23272f", "tertiaryColor": "#23272f"}}}%%
+flowchart TD
+  classDef world fill:#2b6cb0,stroke:#1a4369,color:#ffffff;
+  classDef realm fill:#d69e2e,stroke:#b7791f,color:#1a202c;
+  classDef region fill:#38a169,stroke:#276749,color:#ffffff;
+  classDef biome fill:#dd6b20,stroke:#9c4221,color:#ffffff;
+  classDef location fill:#06b6d4,stroke:#0891b2,color:#ffffff;
+  classDef point fill:#805ad5,stroke:#553c9a,color:#ffffff;
+  classDef faction fill:#22c55e,stroke:#15803d,color:#ffffff;
+  classDef character fill:#d53f8c,stroke:#97266d,color:#ffffff;
+  classDef creature fill:#3b82f6,stroke:#1d4ed8,color:#ffffff;
+  classDef concept fill:#cbd5e0,stroke:#a0aec0,color:#1a202c;
+  classDef placeConcept fill:#f472b6,stroke:#be185d,color:#ffffff;
+  classDef history fill:#ecc94b,stroke:#b7791f,color:#1a202c;
+  classDef object fill:#38b2ac,stroke:#2c7a7b,color:#1a202c;
+  classDef role fill:#4a5568,stroke:#2d3748,color:#ffffff;
+  classDef race fill:#c53030,stroke:#9b2c2c,color:#ffffff;
+  World_terra(["World: Terra"])
+  class World_terra world
+  Faction_wolf_pack["Faction: Wolf Pack"]
+  class Faction_wolf_pack faction
+  faction_glen_riders["Faction: Glen Riders"]
+  class faction_glen_riders faction
+  region_the_sea_of_glass(["Region: The Sea of Glass"])
+  class region_the_sea_of_glass region
+  realm_americana(["Realm: Americana"])
+  class realm_americana realm
+  realm_americana --> region_the_sea_of_glass
+  World_terra --> realm_americana
+  style World_terra fill:#2b6cb0,stroke:#1a4369,color:#ffffff
+  style Faction_wolf_pack fill:#22c55e,stroke:#15803d,color:#ffffff
+  style faction_glen_riders fill:#22c55e,stroke:#15803d,color:#ffffff
+  style region_the_sea_of_glass fill:#38a169,stroke:#276749,color:#ffffff
+  style realm_americana fill:#d69e2e,stroke:#b7791f,color:#1a202c
+  Faction_wolf_pack -.-> region_the_sea_of_glass
+  faction_glen_riders -.-> region_the_sea_of_glass
+    </div>
+  </div>
+</body>
+</html>
