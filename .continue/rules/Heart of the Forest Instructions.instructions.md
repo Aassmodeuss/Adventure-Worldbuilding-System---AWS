@@ -27,7 +27,7 @@ Where to find templates and prompts
   - Biome: template — .continue/Lore Card Templates/places/biome.md; prompt — .continue/prompts/Writing Style for Biome Cards.md
   - Location: template — .continue/Lore Card Templates/places/location.md; prompt — .continue/prompts/Writing Style for Location Cards.md
   - Point: template — .continue/Lore Card Templates/places/point.md; prompt — .continue/prompts/Writing Style for Point Cards.md
-  - Place Concept: template — .continue/Lore Card Templates/places/place_concept.md; prompt — .continue/prompts/Writing Style for Place Concept Cards.md
+  - Place Feature: template — .continue/Lore Card Templates/places/place_concept.md; prompt — .continue/prompts/Writing Style for Place Feature Cards.md
 - History
   - Template — .continue/Lore Card Templates/history.md; prompt — .continue/prompts/Writing Style for History Cards.md
 - Concepts

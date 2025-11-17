@@ -21,8 +21,8 @@ Card template
 #### [Class]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences defining the role/class and its primary purpose. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on origin/training, hallmark abilities, resource demands, risks/costs, social standing, typical operations, and limits. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences defining the role/class and its primary purpose. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on origin/training, hallmark abilities, resource demands, risks/costs, social standing, typical operations, and limits. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Role Domain:** martial, arcane, divine, craft, civic, etc.  
 **Typical Training:** how candidates are selected and trained.  

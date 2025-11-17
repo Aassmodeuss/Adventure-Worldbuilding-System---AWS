@@ -21,8 +21,8 @@ Card template
 
 #### [History]
 **Name:**  
-**Summary:** 1-2 sentences on what happened, when, and why it matters now. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-12 sentences, organized under brief headings for clarity (see below). Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences on what happened, when, and why it matters now. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-12 sentences, organized under brief headings for clarity (see below). Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Key Dates:** concise list or range (e.g., 412-418 AS).  
 **Primary Theater(s):** realms/regions/locations most affected.  

@@ -21,8 +21,8 @@ Card template
 #### [Object - Weapon]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences stating what the weapon is and its primary effect or role. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on construction, mechanism of action, ammunition/power, operation/charge, effects on impact, maintenance, and limits/risks. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences stating what the weapon is and its primary effect or role. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on construction, mechanism of action, ammunition/power, operation/charge, effects on impact, maintenance, and limits/risks. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Weapon Class:** melee, sidearm, rifle, launcher, heavy weapon, focus, etc.  
 **Ammunition/Power Source:** fuels, cells, charges, reagents.  

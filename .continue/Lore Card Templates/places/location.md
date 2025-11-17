@@ -21,12 +21,12 @@ Card template
 
 #### [Location]
 **Name:**  
-**Summary:** Identity and significance of the site. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 3-8 sentences on layout, function, economy, governance, risks, and routes. Write this as a standalone section; do not rely on Summary.  
+**Summary:** Identity and significance of the site. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 3-8 sentences on layout, function, economy, governance, risks, and routes. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **local inhabitants:** list domiciled characters, governing factions, and location-specific recurring hazards, or "None"  
 **Tone Keywords:** 3-5 anchors.  
 **Locations of Note:** subordinate points or contained areas (if any)  
-**Potential Gameplay Hooks:** 1-3 concise bullets, specific tasks and stakes.  
+**Potential Gameplay Hooks:** 1-3 concise bullets describing potential interactions, quests, or story events within this location.
 
 
 

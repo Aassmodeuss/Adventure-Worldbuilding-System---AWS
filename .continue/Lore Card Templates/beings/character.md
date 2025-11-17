@@ -22,8 +22,8 @@ Card template
 #### [Character]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences on identity and significance. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on history, appearance cues, hallmark behaviors, traits, abilities, and limits. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences on identity and significance. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on history, appearance cues, hallmark behaviors, traits, abilities, and limits. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Race:** exact race card name(s)  
 **Class/Role:** exact role/class card name(s)  

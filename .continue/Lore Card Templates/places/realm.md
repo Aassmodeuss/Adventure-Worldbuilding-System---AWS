@@ -21,12 +21,12 @@ Card template
 
 #### [Realm]
 **Name:**  
-**Summary:** Realm identity and role within the world. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 3-8 sentences on climate, travel realities, high-level peoples and hazards. Do not list tribes or settlements. Write this as a standalone section; do not rely on Summary.  
+**Summary:** Realm identity and role within the world. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 3-8 sentences on climate, travel realities, high-level peoples and hazards. Do not list tribes or settlements. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **local inhabitants:** None  
 **Tone Keywords:** 3-5 anchors.  
 **Locations of Note:** regions within this realm (exact card names)  
-**Potential Gameplay Hooks:** 1-3 concise bullets, realm-scale choices.  
+**Potential Gameplay Hooks:** 1-3 concise bullets describing potential interactions, quests, or story events within this realm.  
 
 
 

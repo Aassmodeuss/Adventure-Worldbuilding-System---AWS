@@ -19,25 +19,24 @@ Card template
 [ENTRY: {Name}]
 
 #### [Object - Armor]
-**Name:**  
-**Aliases:**  
-**Summary:** 1-2 sentences on what this armor is and why it matters. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on construction, layers/systems, protection types, energy/maintenance needs, limits/failure modes, and notable variants. Write this as a standalone section; do not rely on Summary.  
+**Name:**   
+**Summary:** 1-2 sentences on what this armor is and why it matters. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on construction, layers/systems, protection types, energy/maintenance needs, limits/failure modes, and notable variants. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Armor Class:** light, medium, heavy (or equivalent local scheme)  
 **Layers and Materials:** brief enumeration of layers and materials used  
 **Protection Profile:** kinetic, energy, environmental, arcane, etc.  
 **Maintenance and Power:** upkeep, consumables, charging, self-repair cadence  
 **Drawbacks/Tradeoffs:** mobility, heat, noise, signature, vision, costs  
-**Aligned Factions or Makers:** comma-separated names (if associated)  
-**Known Users:** comma-separated character card names (if notable)  
+**Aligned Factions or Makers:** comma-separated names (if associated)    
 **Potential Gameplay Hooks:** 1-3 concise bullets tied to acquisition, repair, or unique risks.  
 
-Links:
-- Related: link makers, users, and related objects by title  
+  
 
 [END: {Name}]
 ```
+
+
 
 Pre-save checklist
 - Armor Class, Protection Profile, and Layers/Materials populated.  

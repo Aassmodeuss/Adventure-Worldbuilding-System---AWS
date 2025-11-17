@@ -22,8 +22,8 @@ Card template
 #### [Creature]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences on identity, habitat tier, and why it matters. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on sensory cues, behavior patterns, movement and hunting/defense, diet, adaptations, and limits. Note any Blight influence when relevant. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences on identity, habitat tier, and why it matters. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on sensory cues, behavior patterns, movement and hunting/defense, diet, adaptations, and limits. Note any Blight influence when relevant. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Habitats:** comma-separated biome/location card names where it is a recurring resident hazard  
 **Risk and Countermeasures:** 1-3 concise lines naming practical signs to watch for and effective responses  

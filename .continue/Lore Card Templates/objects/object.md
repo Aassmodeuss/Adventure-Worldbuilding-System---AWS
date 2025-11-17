@@ -21,8 +21,8 @@ Card template
 #### [Object]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences on what the object is and what it does. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on composition, function and mechanism, activation/use, compatibility, storage/maintenance, and limits/risks. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences on what the object is and what it does. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on composition, function and mechanism, activation/use, compatibility, storage/maintenance, and limits/risks. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Object Type:** consumable, device, tool, kit, artifact, etc.  
 **Composition/Materials:** key substances or construction  
@@ -32,11 +32,8 @@ Card template
 **Safety/Regulation:** hazards, restrictions, or legal notes  
 **Compatibilities:** known interfaces or users  
 **Aligned Factions or Makers:** comma-separated names (if associated)  
-**Known Users:** comma-separated character card names (if notable)  
 **Potential Gameplay Hooks:** 1-3 concise bullets tied to acquisition, manufacture, regulation, or edge cases.  
 
-Links:
-- Related: link makers, users, and related objects by title  
 
 [END: {Name}]
 ```

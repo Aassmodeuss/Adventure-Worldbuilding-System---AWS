@@ -20,10 +20,10 @@ Card template
 [ENTRY: {Name}]
 
 #### [Race]
-**Name:**  
-**Aliases:**  
-**Summary:** 1-2 sentences on identity, signature traits, and distribution. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on biology/physiology, senses and communication, psychology, culture and society, home regions and diaspora, adaptations, and limits. Write this as a standalone section; do not rely on Summary.  
+**Name:**   
+**Aliases:** 
+**Summary:** 1-2 sentences on identity, signature traits, and distribution. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on biology/physiology, senses and communication, psychology, culture and society, home regions and diaspora, adaptations, and limits. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Typical Lifespan:** numeric range and maturity milestones  
 **Stature and Build:** common height, build, and distinguishing features  

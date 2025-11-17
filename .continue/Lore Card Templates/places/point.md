@@ -21,12 +21,12 @@ Card template
 
 #### [Point]
 **Name:**  
-**Summary:** Function and significance of this point. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 3-5 sentences on access, use, hazards, and what actors do here. Avoid history beyond what explains function. Write this as a standalone section; do not rely on Summary.  
+**Summary:** Function and significance of this point. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 3-5 sentences on access, use, hazards, and what actors do here. Avoid history beyond what explains function. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **local inhabitants:** list stationed roles or "None"  
 **Tone Keywords:** 3-5 anchors.  
 **Locations of Note:** None  
-**Potential Gameplay Hooks:** 1-3 concise bullets, concrete actions.  
+**Potential Gameplay Hooks:** 1-3 concise bullets, concrete actions, events or interactions at this point.  
 
 
 

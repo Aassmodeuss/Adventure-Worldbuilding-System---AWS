@@ -19,12 +19,12 @@ Card template (paste below frontmatter)
 
 #### [World]
 **Name:**  
-**Summary:** 1-2 sentences on identity and significance. Note parallel worlds if relevant. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 3-8 sentences on macro geography, movement between realms, and global forces. Do not list local peoples or settlements. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences on identity and significance. Note parallel worlds if relevant. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 3-8 sentences on macro geography, movement between realms, and global forces. Do not list local peoples or settlements. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **local inhabitants:** None  
 **Tone Keywords:** 3-5 anchors.  
 **Locations of Note:** top-level realms only (exact card names)  
-**Potential Gameplay Hooks:** 1-3 concise bullets, world-scale tasks.  
+**Potential Gameplay Hooks:** 1-3 concise bullets, world-scale events, or interactions.  
 
 
 [END: {Name}]

@@ -6,8 +6,10 @@ Purpose
 Output scope
 - Summary: 1–2 sentences on what happened, when, and why it matters now.
 - Full Description: 4–12 sentences naming actors, actions, outcomes, with dates/eras when known. Use brief inline headings only if provided by the template.
-- Fill Summary and Full Description plus all other headings/fields present in the per‑type template. Use brief inline headings only if the template includes them. For list/reference fields, include only items explicitly provided by the generator inputs or already present in the current card (for rewrites); otherwise leave them empty. Do not add new headings.
+- Fill Summary and Full Description plus all other Card Fields present in the per‑type template. Use brief inline headings only if the template includes them. For list/reference Card Fields, include only items explicitly provided by the generator inputs or already present in the current card (for rewrites); otherwise leave them empty. Do not add new Card Fields or inline headings.
 - Standalone sections: Summary and Full Description must each be independently understandable; do not refer to "above/below" or assume the other is read.
+- Name usage (Summary): Include the card's title name at least once.
+- Name usage (Full Description): Include the card's title name at least twice (natural usage; avoid repetition).
 
 Voice and constraints
 - Objective codex tone; concise; third‑person. Max 24 words per sentence. No semicolons. Avoid metaphors.

@@ -3,7 +3,7 @@ param(
     [string]$JobType,
 
     [Parameter(Mandatory=$true)]
-    [ValidateSet('world','realm','region','biome','location','point','place-concept','concept','character','creature','faction','race','object','weapon','armor','story-object','role','class-progression','history')]
+    [ValidateSet('world','realm','region','biome','location','point','place-concept','place-feature','concept','character','creature','faction','race','object','weapon','armor','story-object','role','class-progression','history')]
     [string]$CardType,
 
     [Parameter(Mandatory=$true)]
@@ -16,8 +16,9 @@ param(
     [string[]]$KnownLinks,             # optional titles for links to pre-fill list fields
     [string]$EraOrTopicBucket,         # for History or Concept buckets
 
-    [ValidateSet('preserve-only','augment','create')]
-    [string]$LorePolicy,
+    # Canon Adherence: accepts internal values and user labels
+    [ValidateSet('preserve-only','augment','create','strict','flexible','creative')]
+    [string]$CanonAdherence,
     [string[]]$NewFacts,
     [string]$DesiredSummary,
     [hashtable]$ExtraNotes,
@@ -39,6 +40,24 @@ param(
 )
 
 # --- Utility Functions ---
+function Resolve-Choice {
+    param(
+        [string]$UserInput,
+        [hashtable]$Map,
+        [string]$Default
+    )
+    $val = if ($null -ne $UserInput) { ("$UserInput").Trim().ToLowerInvariant() } else { '' }
+    if (-not $val -or $val -eq '') { return $Default }
+    foreach ($key in $Map.Keys) {
+        $syns = $Map[$key]
+        if ($syns -isnot [System.Array]) { $syns = @($syns) }
+        foreach ($s in $syns) {
+            if ("$s".ToLowerInvariant() -eq $val) { return $key }
+        }
+    }
+    return $Default
+}
+
 function Test-ResponsesApi {
     param([string]$ModelName)
     if (-not $ModelName) { return $false }
@@ -98,6 +117,27 @@ function Convert-OutputText {
     return $t
 }
 
+# Order-preserving dedupe for array-ish values used by list fields
+function Invoke-DedupArrayPreserveOrder {
+    param([object]$Val)
+    $arr = @()
+    if ($null -eq $Val) { return @() }
+    if ($Val -is [System.Array]) { $arr = $Val }
+    elseif ($Val) { $arr = @("$Val") } else { return @() }
+    $seen = New-Object 'System.Collections.Generic.HashSet[string]'
+    $out = @()
+    foreach ($item in $arr) {
+        if ($null -eq $item) { continue }
+        $norm = ("$item").Trim()
+        if ($norm -eq '') { continue }
+        $ci = $norm.ToLowerInvariant()
+        if ($seen.Contains($ci)) { continue }
+        [void]$seen.Add($ci)
+        $out += $norm
+    }
+    return ,$out
+}
+
 function ConvertTo-Slug {
     param([string]$Text)
     $t = $Text.ToLowerInvariant()
@@ -118,7 +158,8 @@ function Test-IsSpecificLocationName {
     # Normalize quotes
     $n = $n.Trim([char]34,[char]39)
     # Tokenize words (letters/numbers only)
-    $tokens = [regex]::Matches($n, '[A-Za-z][A-Za-z0-9'']*') | ForEach-Object { $_.Value }
+    $pattern = "[A-Za-z][A-Za-z0-9']*"
+    $tokens = [regex]::Matches($n, $pattern) | ForEach-Object { $_.Value }
     if (-not $tokens -or $tokens.Count -eq 0) { return $false }
     # Common generic words to ignore as the sole/distinctive token
     $generic = @(
@@ -158,7 +199,8 @@ function Get-PackPaths {
         'biome'            = @{ template = "$tplBase/places/biome.md";         prompt = "$prmBase/Writing Style for Biome Cards.md" }
         'location'         = @{ template = "$tplBase/places/location.md";      prompt = "$prmBase/Writing Style for Location Cards.md" }
         'point'            = @{ template = "$tplBase/places/point.md";         prompt = "$prmBase/Writing Style for Point Cards.md" }
-        'place-concept'    = @{ template = "$tplBase/places/place_concept.md"; prompt = "$prmBase/Writing Style for Place Concept Cards.md" }
+        'place-concept'    = @{ template = "$tplBase/places/place_concept.md"; prompt = "$prmBase/Writing Style for Place Feature Cards.md" }
+        'place-feature'    = @{ template = "$tplBase/places/place_feature.md"; prompt = "$prmBase/Writing Style for Place Feature Cards.md" }
         'concept'          = @{ template = "$tplBase/concept.md";              prompt = "$prmBase/Writing Style for Concept Cards.md" }
         'character'        = @{ template = "$tplBase/beings/character.md";     prompt = "$prmBase/Writing Style for Character Cards.md" }
         'creature'         = @{ template = "$tplBase/beings/creature.md";      prompt = "$prmBase/Writing Style for Creature Cards.md" }
@@ -192,6 +234,7 @@ function Get-OutputDirectory {
         'location'      { return Join-Path $base 'Places/Locations' }
         'point'         { return Join-Path $base 'Places/Point' }
         'place-concept' { return Join-Path $base 'Places/Place Features' }
+        'place-feature' { return Join-Path $base 'Places/Place Features' }
         'concept'       { if ($EraOrTopic) { return Join-Path (Join-Path $base 'Concepts') $EraOrTopic } else { return Join-Path $base 'Concepts' } }
         'character'     { return Join-Path $base 'Beings/Characters' }
         'creature'      { return Join-Path $base 'Beings/Creatures' }
@@ -538,7 +581,7 @@ function Add-LinksToCardText {
 }
 
 # Determine if a field spec represents cross-references to other card titles
-function Is-CrossRefField {
+function Test-CrossRefField {
     param([pscustomobject]$Spec)
     if (-not $Spec) { return $false }
     $k = ($Spec.key + '')
@@ -568,7 +611,7 @@ function Get-UncreatedReferencesFromFields {
     if (-not $specs -or $specs.Count -eq 0) { return $result }
     $values = Get-ExistingFieldValues -CardText $CardText -FieldSpecs $specs
     foreach ($spec in $specs) {
-        if (-not (Is-CrossRefField -Spec $spec)) { continue }
+        if (-not (Test-CrossRefField -Spec $spec)) { continue }
         $key = $spec.key
         if (-not $values.ContainsKey($key)) { continue }
         $val = $values[$key]
@@ -808,36 +851,38 @@ function New-RequestPayload {
         [string]$SourceCardText,
         [hashtable]$UserNotes,
         [string[]]$NewFacts,
-        [string]$LorePolicy,
+        [string]$CanonAdherence,
         [string]$Model,
         [string]$ContextText,
         [array]$FieldSpecs,
-        [switch]$FieldsOnly
+        [switch]$FieldsOnly,
+        [hashtable]$InteractiveHints,
+        [switch]$IncludeSourceInFieldsOnly
     )
 
-    $policyBlock = switch ($LorePolicy) {
+    $policyBlock = switch ($CanonAdherence) {
         'preserve-only' {
             @(
-                'Lore Policy: PRESERVE-ONLY.',
+                'Canon Adherence: STRICT.',
                 '- Do NOT add any facts not present in SOURCE CARD or USER NOTES.',
                 '- Rephrase only; preserve dates, governance, hazards, tariffs, quotas, names.'
             ) -join "`n"
         }
         'augment' {
             @(
-                'Lore Policy: AUGMENT.',
+                'Canon Adherence: FLEXIBLE.',
                 '- You may add minor connective details consistent with canon and USER NOTES.',
                 '- Do NOT invent new entities, dates, or events unless listed under NEW FACTS AUTHORIZED.'
             ) -join "`n"
         }
         'create' {
             @(
-                'Lore Policy: CREATE.',
+                'Canon Adherence: CREATIVE.',
                 '- You may create new lore consistent with style, tone, and setting.',
                 '- Avoid contradictions and do NOT invent cross-references to unknown pages.'
             ) -join "`n"
         }
-        default { 'Lore Policy: PRESERVE-ONLY.' }
+        default { 'Canon Adherence: STRICT.' }
     }
 
     $system = @()
@@ -860,11 +905,13 @@ function New-RequestPayload {
     } else {
         $system += ''
         $system += "WRITING STYLE PROMPT:`n$StylePrompt"
+        $system += 'Name usage: Include the card''s title name at least once in Summary and at least twice in Full Description (natural usage; avoid repetition).'
     }
 
     $user = @()
     $user += "JOB TYPE: $JobType"
-    $user += "LORE POLICY: $LorePolicy"
+    $canon = switch ($CanonAdherence) { 'preserve-only' { 'strict' } 'augment' { 'flexible' } 'create' { 'creative' } default { 'strict' } }
+    $user += "CANON ADHERENCE: $canon"
     if ($UserNotes) {
         $user += "USER NOTES:" 
         $UserNotes.GetEnumerator() | ForEach-Object { $user += ("- {0}: {1}" -f $_.Key, ($_.Value -join ', ')) }
@@ -897,8 +944,22 @@ function New-RequestPayload {
             $ctx = ConvertTo-UnicodeEscaped $ctx
             $user += "\n$ctx"
         }
+    } elseif ($IncludeSourceInFieldsOnly -and $SourceCardText) {
+        $src = $SourceCardText
+        if ($src.Length -gt 6000) { $src = $src.Substring(0,6000) }
+        $src = ConvertTo-SafeText $src
+        $src = ConvertTo-UnicodeEscaped $src
+        $user += "SOURCE CARD (current text for context):`n$src"
     }
     if ($FieldsOnly) {
+        if ($InteractiveHints -and $InteractiveHints.Keys.Count -gt 0) {
+            $user += 'USER INTENT FOR SELECTED FIELDS:'
+            foreach ($k in $InteractiveHints.Keys) {
+                $hintVal = ("{0}" -f $InteractiveHints[$k])
+                if ($hintVal -and $hintVal.Trim() -ne '') { $user += ("- {0}: {1}" -f $k, $hintVal) }
+            }
+            $user += 'If intent is provided, prefer generating replacements aligned to the hint.'
+        }
         $user += 'OUTPUT: JSON with key fields only (object with the keys listed above).'
         $user += 'For array fields, return an array of strings; for text fields, return a string.'
     } else {
@@ -933,40 +994,42 @@ function New-ResponsesPayload {
         [string]$SourceCardText,
         [hashtable]$UserNotes,
         [string[]]$NewFacts,
-        [string]$LorePolicy,
+        [string]$CanonAdherence,
         [string]$Model,
         [string]$ContextText,
         [array]$FieldSpecs,
-        [switch]$FieldsOnly
+        [switch]$FieldsOnly,
+        [hashtable]$InteractiveHints,
+        [switch]$IncludeSourceInFieldsOnly
     )
 
     # Trim and distill the style prompt to avoid oversized inputs
     # Further reduce to a concise instruction
-    $styleCondensed = "Apply codex voice: objective, concise, third-person. Keep Summary 1-2 sentences; Full Description 3-8 sentences; max 24 words/sentence; no semicolons; no metaphors. Each section must stand alone (do not assume the other is read; avoid 'above/below')."
+    $styleCondensed = "Apply codex voice: objective, concise, third-person. Keep Summary 1-2 sentences; Full Description 3-8 sentences; max 24 words/sentence; no semicolons; no metaphors. Each section must stand alone (do not assume the other is read; avoid 'above/below'). Name usage: Include the card's title name at least once in Summary and at least twice in Full Description (natural usage; avoid repetition)."
 
-    $policyBlock = switch ($LorePolicy) {
+    $policyBlock = switch ($CanonAdherence) {
         'preserve-only' {
             @(
-                'Lore Policy: PRESERVE-ONLY.',
+                'Canon Adherence: STRICT.',
                 '- Do NOT add any facts not present in SOURCE CARD or USER NOTES.',
                 '- Rephrase only; preserve dates, governance, hazards, tariffs, quotas, names.'
             ) -join "`n"
         }
         'augment' {
             @(
-                'Lore Policy: AUGMENT.',
+                'Canon Adherence: FLEXIBLE.',
                 '- You may add minor connective details consistent with canon and USER NOTES.',
                 '- Do NOT invent new entities, dates, or events unless listed under NEW FACTS AUTHORIZED.'
             ) -join "`n"
         }
         'create' {
             @(
-                'Lore Policy: CREATE.',
+                'Canon Adherence: CREATIVE.',
                 '- You may create new lore consistent with style, tone, and setting.',
                 '- Avoid contradictions and do NOT invent cross-references to unknown pages.'
             ) -join "`n"
         }
-        default { 'Lore Policy: PRESERVE-ONLY.' }
+        default { 'Canon Adherence: STRICT.' }
     }
 
     $systemCore = @()
@@ -989,6 +1052,8 @@ function New-ResponsesPayload {
 
     $userParts = @()
     $userParts += "JOB TYPE: $JobType"
+    $canon = switch ($CanonAdherence) { 'preserve-only' { 'strict' } 'augment' { 'flexible' } 'create' { 'creative' } default { 'strict' } }
+    $userParts += "CANON ADHERENCE: $canon"
     if ($UserNotes) {
         $userParts += 'USER NOTES:'
         $UserNotes.GetEnumerator() | ForEach-Object { $userParts += ("- {0}: {1}" -f $_.Key, ($_.Value -join ', ')) }
@@ -1013,6 +1078,13 @@ function New-ResponsesPayload {
             $ctx = ConvertTo-UnicodeEscaped $ctx
             $userParts += $ctx
         }
+    } elseif ($IncludeSourceInFieldsOnly -and $SourceCardText) {
+        # Provide current text as context even when fields-only
+        $src = $SourceCardText
+        if ($src.Length -gt 6000) { $src = $src.Substring(0,6000) }
+        $src = ConvertTo-SafeText $src
+        $src = ConvertTo-UnicodeEscaped $src
+        $userParts += "SOURCE CARD (current text for context):`n$src"
     }
     if ($FieldSpecs -and $FieldSpecs.Count -gt 0) {
         $userParts += 'ADDITIONAL FIELDS TO FILL (write concise values; respect USER NOTES if provided):'
@@ -1024,11 +1096,37 @@ function New-ResponsesPayload {
         }
     }
     if ($FieldsOnly) {
+        if ($InteractiveHints -and $InteractiveHints.Keys.Count -gt 0) {
+            $userParts += 'USER INTENT FOR SELECTED FIELDS:'
+            foreach ($k in $InteractiveHints.Keys) {
+                $hintVal = ("{0}" -f $InteractiveHints[$k])
+                if ($hintVal -and $hintVal.Trim() -ne '') { $userParts += ("- {0}: {1}" -f $k, $hintVal) }
+            }
+            $userParts += 'If intent is provided, prefer generating replacements aligned to the hint.'
+        }
         $userParts += 'OUTPUT: JSON with key fields only (object with the keys listed above).'
         $userParts += 'For array fields, return an array of strings; for text fields, return a string.'
         $userParts += 'Required: Return ALL requested keys under fields; do not omit any key. If unknown, infer a plausible concise value grounded in SOURCE and CONTEXT.'
         $userParts += 'No empty strings or empty arrays. For list fields, return 1-5 items (hooks: 1-3).'
     } else {
+        function Invoke-DedupArrayPreserveOrder {
+            param([object]$Val)
+            $arr = @()
+            if ($Val -is [System.Array]) { $arr = $Val }
+            elseif ($Val) { $arr = @("$Val") } else { return @() }
+            $seen = New-Object 'System.Collections.Generic.HashSet[string]'
+            $out = @()
+            foreach ($item in $arr) {
+                if (-not $item) { continue }
+                $norm = ("$item").Trim()
+                $ci = $norm.ToLowerInvariant()
+                if ($seen.Contains($ci)) { continue }
+                [void]$seen.Add($ci)
+                $out += $norm
+            }
+            return ,$out
+        }
+
         if ($FieldSpecs -and $FieldSpecs.Count -gt 0) {
             $userParts += 'OUTPUT: JSON with keys summary, full_description, and fields (object with the keys listed above).'
             $userParts += 'For array fields, return an array of strings; for text fields, return a string.'
@@ -1198,7 +1296,6 @@ function Set-CardSections {
             $m = [regex]::Match($curr, '^\*\*(.+?):\*\*')
             if (-not $m.Success) { continue }
             $labelFound = $m.Groups[1].Value
-            # Find matching key in AdditionalFields
             $targetLabel = $labelFound
             $lk = $labelFound.ToLowerInvariant()
             if ($labelMap.ContainsKey($lk)) { $targetLabel = $labelMap[$lk] }
@@ -1207,18 +1304,24 @@ function Set-CardSections {
             $val = $AdditionalFields[$keyFromLabel]
             if ($null -eq $val -or $val -eq '') { continue }
             if ($bulletFields.Contains($targetLabel) -and ($val -is [System.Array])) {
-                # Write heading and bullets
+                # Clean any existing bullet lines immediately following current heading
+                $purgeIdx = $i + 1
+                while ($purgeIdx -lt $outLines.Count -and $outLines[$purgeIdx] -match '^\-\s+') {
+                    $outLines.RemoveAt($purgeIdx)
+                }
                 $outLines[$i] = ("**{0}:**" -f $targetLabel)
-                # Insert bullets after this line
-                $idx = $i + 1
-                foreach ($item in $val) {
-                    $outLines.Insert($idx, ("- {0}" -f ("$item").Trim()))
-                    $idx++
+                $insertIdx = $i + 1
+                $valsUnique = Invoke-DedupArrayPreserveOrder -Val $val
+                foreach ($item in $valsUnique) {
+                    $outLines.Insert($insertIdx, ("- {0}" -f ("$item").Trim()))
+                    $insertIdx++
                 }
             } else {
-                # Inline replacement
                 $replacement = $val
-                if ($val -is [System.Array]) { $replacement = ($val -join ', ') }
+                if ($val -is [System.Array]) {
+                    $valsUnique2 = Invoke-DedupArrayPreserveOrder -Val $val
+                    $replacement = ($valsUnique2 -join ', ')
+                }
                 $outLines[$i] = ("**{0}:** {1}" -f $targetLabel, $replacement)
             }
         }
@@ -1294,10 +1397,23 @@ if (-not $MinimalTest) {
     $hasExisting = $false
 }
 
-# Determine default lore policy if not explicitly provided
-if (-not $LorePolicy) {
-    if ($JobType -eq 'rewrite') { $LorePolicy = 'preserve-only' } else { $LorePolicy = 'augment' }
-    if ($NewFacts -and $NewFacts.Count -gt 0 -and $LorePolicy -eq 'preserve-only') { $LorePolicy = 'augment' }
+# Determine default canon adherence if not explicitly provided; normalize labels
+if ($CanonAdherence) {
+    switch ($CanonAdherence.ToLowerInvariant()) {
+        'strict'   { $CanonAdherence = 'preserve-only' }
+        'flexible' { $CanonAdherence = 'augment' }
+        'creative' { $CanonAdherence = 'create' }
+        default { }
+    }
+}
+if (-not $CanonAdherence) {
+    $canonProvided = $PSBoundParameters.ContainsKey('CanonAdherence')
+    $CanonAdherence = if ($JobType -eq 'rewrite') { 'preserve-only' } else { 'augment' }
+    if ($NewFacts -and $NewFacts.Count -gt 0 -and $CanonAdherence -eq 'preserve-only') { $CanonAdherence = 'augment' }
+    if (-not $canonProvided -and ($VerbosePreview -or $DryRun)) {
+        $label = switch ($CanonAdherence) { 'preserve-only' { 'strict' } 'augment' { 'flexible' } 'create' { 'creative' } default { 'strict' } }
+        Write-Host ("Canon Adherence auto-selected: {0} ({1})" -f $label, $CanonAdherence) -ForegroundColor DarkCyan
+    }
 }
 
 $useResponses = (Test-ResponsesApi -ModelName $Model) -and (-not $ForceChat)
@@ -1310,6 +1426,9 @@ if (-not $ForceChat -and $useResponses -and ($Model -match '^gpt-4\.1')) {
 # Build request
 $style = if ($MinimalTest) { 'Write concise, objective text for Summary (1-2 sentences) and Full Description (3-8 sentences). Each must stand alone.' } else { Get-WritingStylePrompt -PromptPath $pack.prompt }
 $userNotes = @{}
+# Always include fixed card metadata so the model knows the subject
+$userNotes['name'] = @($Name)
+$userNotes['card_type'] = @($CardType)
 if ($ToneKeywords) { $userNotes['tone_keywords'] = $ToneKeywords }
 if ($LocationsOfNote) { $userNotes['locations_of_note'] = $LocationsOfNote }
 if ($KnownLinks) { $userNotes['links'] = $KnownLinks }
@@ -1367,9 +1486,9 @@ if ($MinimalTest) {
 
 if ($useResponses) {
     $Endpoint = 'https://api.openai.com/v1/responses'
-    $payload = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $Model -ContextText $contextText -FieldSpecs $fieldSpecs
+    $payload = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $contextText -FieldSpecs $fieldSpecs
 } else {
-    $payload = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $Model -ContextText $contextText -FieldSpecs $fieldSpecs
+    $payload = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $contextText -FieldSpecs $fieldSpecs
 }
 
 if ($DryRun) {
@@ -1398,7 +1517,7 @@ try {
         Write-Host "Responses 400 detected. Attempting two-pass flow (Responses)…" -ForegroundColor Yellow
         # Pass A: summary/full only (Responses, minimal payload)
         $EndpointA = 'https://api.openai.com/v1/responses'
-        $payloadA = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $Model -ContextText $contextText -FieldSpecs @()
+        $payloadA = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $contextText -FieldSpecs @()
         $summaryA = $null; $fullA = $null
         try {
             $respA = Invoke-Model -Payload $payloadA -ApiKey $ApiKey -Endpoint $EndpointA
@@ -1421,7 +1540,7 @@ try {
             $fb = if ($FallbackModel -and ($FallbackModel -match '^(gpt-4o)')) { $FallbackModel } else { 'gpt-4o-mini' }
             Write-Host "Pass A failed. Retrying summary/full via Chat '$fb'…" -ForegroundColor Yellow
             $EndpointA = 'https://api.openai.com/v1/chat/completions'
-            $payloadA = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $fb -ContextText $contextText -FieldSpecs @()
+            $payloadA = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $fb -ContextText $contextText -FieldSpecs @()
             $respA = Invoke-Model -Payload $payloadA -ApiKey $ApiKey -Endpoint $EndpointA
             $objA = $respA.choices[0].message.content | ConvertFrom-Json
             $summaryA = "$($objA.summary)".Trim()
@@ -1433,7 +1552,7 @@ try {
         if ($fieldSpecs -and $fieldSpecs.Count -gt 0) {
             try {
                 $EndpointB = 'https://api.openai.com/v1/responses'
-                $payloadB = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $Model -ContextText $contextText -FieldSpecs $fieldSpecs -FieldsOnly
+                $payloadB = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $contextText -FieldSpecs $fieldSpecs -FieldsOnly
                 $respB = Invoke-Model -Payload $payloadB -ApiKey $ApiKey -Endpoint $EndpointB
                 $jsonTextB = $null
                 if ($respB.output_text) { $jsonTextB = $respB.output_text }
@@ -1457,7 +1576,7 @@ try {
                     Write-Host "Pass B failed. Retrying fields-only via Chat '$fb'…" -ForegroundColor Yellow
                     try {
                         $EndpointB = 'https://api.openai.com/v1/chat/completions'
-                        $payloadB = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $fb -ContextText $contextText -FieldSpecs $fieldSpecs -FieldsOnly
+                        $payloadB = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $fb -ContextText $contextText -FieldSpecs $fieldSpecs -FieldsOnly
                         $respB = Invoke-Model -Payload $payloadB -ApiKey $ApiKey -Endpoint $EndpointB
                         $objB = $respB.choices[0].message.content | ConvertFrom-Json
                         if ($objB.PSObject.Properties.Name -contains 'fields') { $fieldsObj = $objB.fields }
@@ -1574,10 +1693,10 @@ try {
         # Build a Fields-only payload for just the missing keys
         if ($useResponses) {
             $EndpointRetry = 'https://api.openai.com/v1/responses'
-            $payloadRetry = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $Model -ContextText $null -FieldSpecs $missingSpecs -FieldsOnly
+            $payloadRetry = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $sourceCard -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $null -FieldSpecs $missingSpecs -FieldsOnly
         } else {
             $EndpointRetry = 'https://api.openai.com/v1/chat/completions'
-            $payloadRetry = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $null -UserNotes $userNotes -NewFacts $NewFacts -LorePolicy $LorePolicy -Model $Model -ContextText $null -FieldSpecs $missingSpecs -FieldsOnly
+            $payloadRetry = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $null -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $null -FieldSpecs $missingSpecs -FieldsOnly
         }
         $respRetry = Invoke-Model -Payload $payloadRetry -ApiKey $ApiKey -Endpoint $EndpointRetry
         $retryFields = @{}
@@ -1653,10 +1772,214 @@ Write-Host "\n===== PREVIEW: $Name ($CardType) =====" -ForegroundColor Green
 Write-Output $finalText
 Write-Host "===== END PREVIEW =====\n" -ForegroundColor Green
 
-$confirm = if ($AutoApply) { 'y' } else { Read-Host 'Apply changes to file? (y/n)' }
-if ($confirm -ne 'y') {
-    Write-Host 'Aborted by user. No changes written.' -ForegroundColor Yellow
-    exit 0
+$confirmRaw = if ($AutoApply) { 'y' } else { Read-Host 'Apply changes to file? (y/n)' }
+$confirm = Resolve-Choice -UserInput $confirmRaw -Map @{ yes=@('y','yes'); no=@('n','no') } -Default 'no'
+if ($confirm -ne 'yes') {
+    while ($true) {
+        $nextRaw = Read-Host 'Next action: [e]dit selected Card Fields or [x] exit generation? (e/x)'
+        $next = Resolve-Choice -UserInput $nextRaw -Map @{ edit=@('e','edit'); exit=@('x','exit','q','quit') } -Default 'edit'
+        if ($next -eq 'exit') {
+            Write-Host 'Aborted by user. No changes written.' -ForegroundColor Yellow
+            return
+        }
+        if ($next -ne 'edit') { continue }
+
+        # Collect field specs and user selection
+        $templateSpecs = Get-TemplateFieldSpecs -TemplateBody $bodyTemplate
+        $names = Read-Host 'Card Fields to edit (comma-separated labels or keys)'
+        $rawFields = @()
+        if ($names) { $rawFields = $names.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ } }
+        $selectedSpecs = @()
+        foreach ($nf in $rawFields) {
+            $found = $null
+            # Match by label (case-insensitive)
+            $found = $templateSpecs | Where-Object { $_.label -and ($_.label.Trim().ToLowerInvariant() -eq $nf.ToLowerInvariant()) }
+            if (-not $found -or $found.Count -eq 0) {
+                # Match by key
+                $found = $templateSpecs | Where-Object { $_.key -and ($_.key.Trim().ToLowerInvariant() -eq $nf.ToLowerInvariant()) }
+            }
+            if ($found) { $selectedSpecs += $found }
+        }
+        if (-not $selectedSpecs -or $selectedSpecs.Count -eq 0) {
+            Write-Host 'No matching Card Fields found. Try again.' -ForegroundColor Yellow
+            continue
+        }
+
+        $modeRaw = Read-Host 'Edit mode: [m]anual or [i]nteractive? (m/i)'
+        $mode = Resolve-Choice -UserInput $modeRaw -Map @{ manual=@('m','manual'); interactive=@('i','interactive') } -Default 'interactive'
+        if ($mode -eq 'manual') {
+            foreach ($fs in $selectedSpecs) {
+                if ($fs.isList -or $fs.bullet) {
+                    $inp = Read-Host ("Enter items for '{0}' (comma-separated)" -f $fs.label)
+                    $vals = @()
+                    if ($inp) { $vals = $inp.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } }
+                    $additional[$fs.key] = $vals
+                } else {
+                    $inp = Read-Host ("Enter text for '{0}'" -f $fs.label)
+                    $additional[$fs.key] = $inp
+                }
+            }
+        } elseif ($mode -eq 'interactive') {
+            # Fields-only generation for selected specs using current edited text as source
+            if (-not $ApiKey) {
+                Write-Host 'Interactive mode skipped: API key not set.' -ForegroundColor Yellow
+            } else {
+                try {
+                    # Build stripped source: remove existing values for selected fields to reduce echoing
+                    $currentSource = $editedText
+                    try {
+                        $linesIS = $editedText -split "`n"
+                        $labelsToStrip = New-Object 'System.Collections.Generic.HashSet[string]'
+                        foreach ($s in $selectedSpecs) { if ($s.label) { [void]$labelsToStrip.Add($s.label) } }
+                        $rebuilt = New-Object System.Collections.Generic.List[string]
+                        for ($ix = 0; $ix -lt $linesIS.Length; $ix++) {
+                            $lnIS = $linesIS[$ix]
+                            $mIS = [regex]::Match($lnIS,'^\*\*(.+?):\*\*')
+                            if ($mIS.Success) {
+                                $lblIS = $mIS.Groups[1].Value
+                                if ($labelsToStrip.Contains($lblIS)) {
+                                    $specIS = $selectedSpecs | Where-Object { $_.label -eq $lblIS }
+                                    if ($specIS -and ($specIS.bullet -or $specIS.isList)) {
+                                        # Replace heading with blank value; skip following bullet lines
+                                        $rebuilt.Add("**${lblIS}:**") | Out-Null
+                                        $skip = $ix + 1
+                                        while ($skip -lt $linesIS.Length -and $linesIS[$skip] -match '^\-\s+') { $skip++ }
+                                        $ix = $skip - 1
+                                        continue
+                                    } else {
+                                        $rebuilt.Add("**${lblIS}:**") | Out-Null
+                                        continue
+                                    }
+                                }
+                            }
+                            $rebuilt.Add($lnIS) | Out-Null
+                        }
+                        $currentSource = ($rebuilt -join "`n")
+                    } catch { Write-Host ("Strip existing field values failed: {0}" -f $_.Exception.Message) -ForegroundColor DarkYellow }
+                    $appendRaw = Read-Host 'List field merge strategy: [a]ppend or [r]eplace existing content? (a/r, default=r)'
+                    $appendChoice = Resolve-Choice -UserInput $appendRaw -Map @{ append=@('a','append'); replace=@('r','replace') } -Default 'replace'
+                    $doAppend = ($appendChoice -eq 'append')
+                    # Optional per-field hints from user
+                    $hints = @{}
+                    foreach ($fs in $selectedSpecs) {
+                        $hintIn = Read-Host ("Optional hint for '{0}' (press Enter to skip)" -f $fs.label)
+                        if ($hintIn) { $hints[$fs.key] = $hintIn }
+                    }
+                    if ($useResponses) {
+                        $EndpointSel = 'https://api.openai.com/v1/responses'
+                        $payloadSel = New-ResponsesPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $currentSource -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $null -FieldSpecs $selectedSpecs -FieldsOnly -InteractiveHints $hints -IncludeSourceInFieldsOnly
+                        $respSel = Invoke-Model -Payload $payloadSel -ApiKey $ApiKey -Endpoint $EndpointSel
+                        $jsonSel = $null
+                        if ($respSel.output_text) { $jsonSel = $respSel.output_text }
+                        elseif ($respSel.output -and $respSel.output.Count -gt 0) {
+                            $partsS = @()
+                            foreach ($blk in $respSel.output) { if ($blk.content) { foreach ($c in $blk.content) { if ($c.text) { $partsS += $c.text } elseif ($c.output_text) { $partsS += $c.output_text } } } }
+                            $jsonSel = ($partsS -join "`n")
+                        }
+                        if ($jsonSel) {
+                            $objS = $jsonSel | ConvertFrom-Json
+                            if ($objS.fields) {
+                                foreach ($p in $objS.fields.PSObject.Properties) {
+                                    $newVal = $p.Value
+                                    if ($doAppend -and $additional.ContainsKey($p.Name) -and ($newVal -is [System.Array])) {
+                                        $existingVal = $additional[$p.Name]
+                                        $merged = @()
+                                        if ($existingVal -is [System.Array]) { $merged = @($existingVal + $newVal) } else { $merged = @($existingVal) + $newVal }
+                                        $additional[$p.Name] = (Invoke-DedupArrayPreserveOrder -Val $merged)
+                                    } else {
+                                        # Replace; still dedupe arrays
+                                        if ($newVal -is [System.Array]) { $additional[$p.Name] = (Invoke-DedupArrayPreserveOrder -Val $newVal) } else { $additional[$p.Name] = $newVal }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $EndpointSel = 'https://api.openai.com/v1/chat/completions'
+                        $payloadSel = New-RequestPayload -StylePrompt $style -TemplateBody $bodyTemplate -JobType $JobType -SourceCardText $currentSource -UserNotes $userNotes -NewFacts $NewFacts -CanonAdherence $CanonAdherence -Model $Model -ContextText $null -FieldSpecs $selectedSpecs -FieldsOnly -InteractiveHints $hints -IncludeSourceInFieldsOnly
+                        $respSel = Invoke-Model -Payload $payloadSel -ApiKey $ApiKey -Endpoint $EndpointSel
+                        $objS = $respSel.choices[0].message.content | ConvertFrom-Json
+                        if ($objS.fields) {
+                            foreach ($p in $objS.fields.PSObject.Properties) {
+                                $newVal = $p.Value
+                                if ($doAppend -and $additional.ContainsKey($p.Name) -and ($newVal -is [System.Array])) {
+                                    $existingVal = $additional[$p.Name]
+                                    $merged = @()
+                                    if ($existingVal -is [System.Array]) { $merged = @($existingVal + $newVal) } else { $merged = @($existingVal) + $newVal }
+                                    $additional[$p.Name] = (Invoke-DedupArrayPreserveOrder -Val $merged)
+                                } else {
+                                    if ($newVal -is [System.Array]) { $additional[$p.Name] = (Invoke-DedupArrayPreserveOrder -Val $newVal) } else { $additional[$p.Name] = $newVal }
+                                }
+                            }
+                        }
+                    }
+                } catch {
+                    Write-Host ("Interactive fill failed: {0}" -f $_.Exception.Message) -ForegroundColor Yellow
+                }
+            }
+        } else {
+            continue
+        }
+
+        # Re-sanitize Locations of Note after edits
+        if ($additional.ContainsKey('locations_of_note')) {
+            $vals2 = $additional['locations_of_note']
+            $clean2 = @()
+            $seen2 = New-Object 'System.Collections.Generic.HashSet[string]'
+            if ($vals2 -is [System.Array]) {
+                foreach ($it in $vals2) {
+                    if (-not $it) { continue }
+                    $norm2 = ("$it").Trim('"',[char]39).Trim()
+                    if ($norm2 -eq '') { continue }
+                    $ci2 = $norm2.ToLowerInvariant()
+                    if ($seen2.Contains($ci2)) { continue }
+                    if (Test-IsSpecificLocationName -Name $norm2) { [void]$seen2.Add($ci2); $clean2 += $norm2 }
+                }
+            } elseif ($vals2) {
+                $norm2 = ("$vals2").Trim('"',[char]39).Trim()
+                if (Test-IsSpecificLocationName -Name $norm2) { $clean2 = @($norm2) }
+            }
+            if ($clean2.Count -gt 0) { $additional['locations_of_note'] = $clean2 } else { $additional.Remove('locations_of_note') | Out-Null }
+        }
+
+        # Rebuild edited text with new AdditionalFields
+        $editedText = Set-CardSections -CardText $editedText -Summary $summary -FullDescription $fullDesc -AdditionalFields $additional
+
+        # Rebuild final text (frontmatter + normalization + autolinking) and preview again
+        if ($hasExisting) { $finalText = $editedText } else { $finalText = ($frontmatter + "`n`n" + $editedText) }
+        $finalText = Convert-OutputText $finalText
+        try {
+            $allTitles2 = Get-AllCardTitles
+            if (-not $allTitles2) { throw 'AllTitles set was null' }
+            $existingLinks2 = Get-ExistingLinksFromBlock -CardText $finalText
+            if (-not $existingLinks2) { $existingLinks2 = New-Object 'System.Collections.Generic.HashSet[string]' }
+            $mentions2 = Get-MentionedTitlesFromBody -CardText $finalText -AllTitles $allTitles2 -SelfTitle $Name
+            if (-not $mentions2) { $mentions2 = New-Object 'System.Collections.Generic.HashSet[string]' }
+            $toAdd2 = New-Object 'System.Collections.Generic.HashSet[string]'
+            foreach ($t in $mentions2) { if ($t -and (-not $existingLinks2.Contains($t))) { [void]$toAdd2.Add($t) } }
+            $finalText = Add-LinksToCardText -CardText $finalText -TitlesToAdd $toAdd2
+            $allLinkedTitles2 = Get-ExistingLinksFromBlock -CardText $finalText
+            if (-not $allLinkedTitles2) { $allLinkedTitles2 = New-Object 'System.Collections.Generic.HashSet[string]' }
+            $linkedIds2 = @()
+            foreach ($lt2 in $allLinkedTitles2) {
+                $p2 = Find-CardByTitle -Title $lt2
+                if ($p2) {
+                    try { $fmT2 = Read-FrontMatter -Path $p2; if ($fmT2 -and $fmT2['id']) { $linkedIds2 += $fmT2['id'] } } catch {}
+                }
+            }
+            if ($linkedIds2.Count -gt 0) { $finalText = Update-SeeAlsoInCardText -CardText $finalText -IdsToMerge $linkedIds2 }
+            $script:PotentialRefsForLog = Get-UncreatedReferencesFromFields -CardText $finalText -TemplateBody $bodyTemplate -AllTitles $allTitles2
+        } catch {
+            Write-Host ("Auto-linking skipped: {0}" -f $_.Exception.Message) -ForegroundColor Yellow
+        }
+
+        Write-Host "\n===== PREVIEW: $Name ($CardType) =====" -ForegroundColor Green
+        Write-Output $finalText
+        Write-Host "===== END PREVIEW =====\n" -ForegroundColor Green
+
+        $confirm2Raw = Read-Host 'Apply changes to file? (y/n)'
+        $confirm2 = Resolve-Choice -UserInput $confirm2Raw -Map @{ yes=@('y','yes'); no=@('n','no') } -Default 'no'
+        if ($confirm2 -eq 'yes') { break } else { continue }
+    }
 }
 
 # Write file
@@ -1674,8 +1997,9 @@ try {
 }
 
 # Optionally trigger index update
-$runIndexer = if ($AutoIndex) { 'y' } else { Read-Host 'Run update_lore_indexes.ps1 now? (y/n)' }
-if ($runIndexer -eq 'y') {
+$runIndexerRaw = if ($AutoIndex) { 'y' } else { Read-Host 'Run update_lore_indexes.ps1 now? (y/n)' }
+$runIndexer = Resolve-Choice -UserInput $runIndexerRaw -Map @{ yes=@('y','yes'); no=@('n','no') } -Default 'no'
+if ($runIndexer -eq 'yes') {
     $wsRoot = (Split-Path $PSScriptRoot -Parent)
     $toolsScript = Join-Path $wsRoot 'tools\update_lore_indexes.ps1'
     $rootScript  = Join-Path $wsRoot 'update_lore_indexes.ps1'

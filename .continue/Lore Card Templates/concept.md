@@ -21,8 +21,8 @@ Card template
 #### [Concept]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences that define the concept and why it matters now. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences covering definition, mechanism/process, tell-tale signs, spread/vectors, impacts, and known limits. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences that define the concept and why it matters now. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences covering definition, mechanism/process, tell-tale signs, spread/vectors, impacts, and known limits. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Domains/Scope:** list affected areas (e.g., Magic, Corruption, Society, Warfare).  
 **Tell-tale Signs:** brief cues that reveal presence or escalation.  

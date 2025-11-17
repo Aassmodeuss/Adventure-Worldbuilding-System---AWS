@@ -21,7 +21,7 @@ Card template
 
 #### [Class Progression]
 **Name:**  
-**Summary:** 1-2 sentences defining the progression for the class and how members advance. Write this as a standalone section; do not rely on Full Description.  
+**Summary:** 1-2 sentences defining the progression for the class and how members advance. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
 **Progression Overview:** 3-6 sentences on tiers/milestones, training cadence, assessment gates, and typical time/risks between ranks.  
 **Tone Keywords:** 3-5 anchors.  
 **Associated Class:** exact role/class card title  

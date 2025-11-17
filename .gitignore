@@ -21,6 +21,10 @@ Thumbs.db
 !/.gitignore
 !/Lore/.gitkeep
 !/Lore/**/.gitkeep
+# Optional: keep top-level lore index and graph artifacts (uncomment to track)
+# !/Lore/Lorebook/README_Lore_Index.md
+# !/Lore/Tree.md
+# !/Lore/Tree.html
 
 # Personal outlines or design docs (likely contain direct lore)
 # Personal outlines or design docs (likely contain direct lore)

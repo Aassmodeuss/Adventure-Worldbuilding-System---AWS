@@ -21,8 +21,8 @@ Card template
 #### [Object - Story]
 **Name:**  
 **Aliases:**  
-**Summary:** 1-2 sentences stating what the object is, why it exists, and why it matters now. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 5-12 sentences on origin and construction, intended function, operating principles, control systems/stewardship, notable historical phases, current status, and known risks/limits. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences stating what the object is, why it exists, and why it matters now. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 5-12 sentences on origin and construction, intended function, operating principles, control systems/stewardship, notable historical phases, current status, and known risks/limits. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Object Class:** artifact, installation, relic, prototype, megastructure, etc.  
 **Origin and Makers:** who designed/built it and when.  

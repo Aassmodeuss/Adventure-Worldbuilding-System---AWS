@@ -19,10 +19,10 @@ Card template
 [ENTRY: {Name}]
 
 #### [Faction]
-**Name:**  
+**Name:** 
 **Aliases:**  
-**Summary:** 1-2 sentences on identity and significance. Write this as a standalone section; do not rely on Full Description.  
-**Full Description:** 4-10 sentences on history, structure, aims, operations, and conflicts. Write this as a standalone section; do not rely on Summary.  
+**Summary:** 1-2 sentences on identity and significance. Write this as a standalone section; do not rely on Full Description. Include the card's title name at least once.  
+**Full Description:** 4-10 sentences on history, structure, aims, operations, and conflicts. Write this as a standalone section; do not rely on Summary. Include the card's title name at least twice (natural usage; avoid repetition).  
 **Tone Keywords:** 3-5 anchors.  
 **Aligned Characters:** comma-separated character card names  
 **Known Locations:** comma-separated location card names  

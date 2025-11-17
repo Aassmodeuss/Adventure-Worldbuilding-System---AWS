@@ -195,8 +195,10 @@ $typeClassMap = @{
   'point' = 'point';
   'faction' = 'faction';
   'character' = 'character';
+    'creature' = 'creature';
   'concept' = 'concept';
-  'place-concept' = 'placeConcept';
+    'place-concept' = 'placeConcept';
+    'place-feature' = 'placeConcept';
   'history' = 'history';
   'object' = 'object';
   'class' = 'role';
@@ -208,12 +210,13 @@ $mermaid += '  classDef world fill:#2b6cb0,stroke:#1a4369,color:#ffffff;'
 $mermaid += '  classDef realm fill:#d69e2e,stroke:#b7791f,color:#1a202c;'
 $mermaid += '  classDef region fill:#38a169,stroke:#276749,color:#ffffff;'
 $mermaid += '  classDef biome fill:#dd6b20,stroke:#9c4221,color:#ffffff;'
-$mermaid += '  classDef location fill:#718096,stroke:#4a5568,color:#ffffff;'
+$mermaid += '  classDef location fill:#06b6d4,stroke:#0891b2,color:#ffffff;'
 $mermaid += '  classDef point fill:#805ad5,stroke:#553c9a,color:#ffffff;'
-$mermaid += '  classDef faction fill:#805ad5,stroke:#553c9a,color:#ffffff;'
+$mermaid += '  classDef faction fill:#22c55e,stroke:#15803d,color:#ffffff;'
 $mermaid += '  classDef character fill:#d53f8c,stroke:#97266d,color:#ffffff;'
+$mermaid += '  classDef creature fill:#3b82f6,stroke:#1d4ed8,color:#ffffff;'
 $mermaid += '  classDef concept fill:#cbd5e0,stroke:#a0aec0,color:#1a202c;'
-$mermaid += '  classDef placeConcept fill:#edf2f7,stroke:#94a3b8,color:#1a202c;'
+$mermaid += '  classDef placeConcept fill:#f472b6,stroke:#be185d,color:#ffffff;'
 $mermaid += '  classDef history fill:#ecc94b,stroke:#b7791f,color:#1a202c;'
 $mermaid += '  classDef object fill:#38b2ac,stroke:#2c7a7b,color:#1a202c;'
 $mermaid += '  classDef role fill:#4a5568,stroke:#2d3748,color:#ffffff;'
@@ -228,12 +231,14 @@ $typeStyleMap = @{
     'realm'         = @{ fill = '#d69e2e'; stroke = '#b7791f'; color = '#1a202c' };
   'region'        = @{ fill = '#38a169'; stroke = '#276749'; color = '#ffffff' };
   'biome'         = @{ fill = '#dd6b20'; stroke = '#9c4221'; color = '#ffffff' };
-  'location'      = @{ fill = '#718096'; stroke = '#4a5568'; color = '#ffffff' };
+    'location'      = @{ fill = '#06b6d4'; stroke = '#0891b2'; color = '#ffffff' };
     'point'         = @{ fill = '#805ad5'; stroke = '#553c9a'; color = '#ffffff' };
-  'faction'       = @{ fill = '#805ad5'; stroke = '#553c9a'; color = '#ffffff' };
+    'faction'       = @{ fill = '#22c55e'; stroke = '#15803d'; color = '#ffffff' };
   'character'     = @{ fill = '#d53f8c'; stroke = '#97266d'; color = '#ffffff' };
+    'creature'      = @{ fill = '#3b82f6'; stroke = '#1d4ed8'; color = '#ffffff' };
   'concept'       = @{ fill = '#cbd5e0'; stroke = '#a0aec0'; color = '#1a202c' };
-  'place-concept' = @{ fill = '#edf2f7'; stroke = '#94a3b8'; color = '#1a202c' };
+    'place-concept' = @{ fill = '#f472b6'; stroke = '#be185d'; color = '#ffffff' };
+    'place-feature' = @{ fill = '#f472b6'; stroke = '#be185d'; color = '#ffffff' };
   'event'         = @{ fill = '#ecc94b'; stroke = '#b7791f'; color = '#1a202c' };
   'object'        = @{ fill = '#38b2ac'; stroke = '#2c7a7b'; color = '#1a202c' };
   'class'         = @{ fill = '#4a5568'; stroke = '#2d3748'; color = '#ffffff' };
@@ -246,8 +251,8 @@ foreach ($node in $graphNodes.Values) {
     $label = $(
         $labelTypeMap = @{
             'world'='World'; 'realm'='Realm'; 'region'='Region'; 'biome'='Biome';
-            'location'='Location'; 'point'='Point'; 'faction'='Faction'; 'character'='Character';
-            'concept'='Concept'; 'place-concept'='Place Concept'; 'history'='History'; 'object'='Object';
+            'location'='Location'; 'point'='Point'; 'faction'='Faction'; 'character'='Character'; 'creature'='Creature';
+            'concept'='Concept'; 'place-concept'='Place Feature'; 'place-feature'='Place Feature'; 'history'='History'; 'object'='Object';
             'class'='Role'; 'race'='Race'
         }
         $typeLabel = $labelTypeMap[$node.type]
@@ -266,7 +271,14 @@ foreach ($node in $graphNodes.Values) {
         }
         "{0}: {1}" -f $typeLabel, $displayName
     )
-    $mermaid += ('  {0}["{1}"]' -f $sid, $label)
+    $placeTypes = @('world','realm','region','biome','location','point','place-concept','place-feature')
+    if ($placeTypes -contains $node.type) {
+        # Stadium shape for all place nodes
+        $mermaid += ('  {0}(["{1}"])' -f $sid, $label)
+    } else {
+        # Default rectangle for non-place nodes
+        $mermaid += ('  {0}["{1}"]' -f $sid, $label)
+    }
     if ($typeClassMap.ContainsKey($node.type)) { $mermaid += ('  class {0} {1}' -f $sid, $typeClassMap[$node.type]) }
 }
 
@@ -332,8 +344,8 @@ foreach ($node in $graphNodes.Values) {
                 $label = $(
                     $labelTypeMap = @{
                         'world'='World'; 'realm'='Realm'; 'region'='Region'; 'biome'='Biome';
-                        'location'='Location'; 'point'='Point'; 'faction'='Faction'; 'character'='Character';
-                        'concept'='Concept'; 'place-concept'='Place Concept'; 'history'='History'; 'object'='Object';
+                        'location'='Location'; 'point'='Point'; 'faction'='Faction'; 'character'='Character'; 'creature'='Creature';
+                        'concept'='Concept'; 'place-concept'='Place Feature'; 'place-feature'='Place Feature'; 'history'='History'; 'object'='Object';
                         'class'='Role'; 'race'='Race'
                     }
                     $typeLabel = $labelTypeMap[$node.type]

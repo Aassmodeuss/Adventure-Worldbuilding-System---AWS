@@ -50,7 +50,7 @@ CardGen Utilities (PowerShell)
   ```powershell
   .\tools\cardgen.ps1 -JobType new -CardType character -Name "Elder Rowan" -Parent realm:greenwood -Model $env:OPENAI_MODEL -ApiKey $env:OPENAI_API_KEY -AutoApply -AutoIndex
   ```
-- Rewrite current open file (task): "CardGen: Rewrite Current Card". Default lore policy for rewrites is `preserve-only` unless `-NewFacts` is provided.
+- Rewrite current open file (task): "CardGen: Rewrite Current Card". Default canon adherence is `strict` (maps to `preserve-only`) unless `-NewFacts` is provided.
 
 Conventions & Gotchas
 - Keep `name` canonical; wrappers and validations depend on exact matching.
